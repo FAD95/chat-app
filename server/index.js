@@ -2,6 +2,8 @@ const express = require('express')
 const socketio = require('socket.io')
 const http = require('http')
 
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./src/users')
+
 const PORT = process.env.PORT || 5000
 
 const router = require('./src/router')
@@ -14,8 +16,11 @@ io.on('connection', (socket) => {
   console.log('We have a new connection')
 
   socket.on('join', ({ name, room }, cb) => {
-    console.log({ name, room })
-    cb()
+    const { error, user } = addUser({ id: socket.id, name, room })
+
+    if (error) cb(error)
+
+    socket.join(user.room)
   })
   socket.on('disconnect', () => {
     console.log('User had left')
