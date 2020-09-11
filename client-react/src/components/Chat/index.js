@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react'
 import queryString from 'query-string'
 import io from 'socket.io-client'
+import InfoBar from '../InfoBar'
+import Messages from '../Messages'
+import Input from '../Input'
+import { Container } from './styles'
+import { FlexContainer } from '../../styles/utils'
 
 let socket
 
 const Chat = ({ location }) => {
-  const [nameSession, setNameSession] = useState('')
-  const [roomSession, setRoomSession] = useState('')
+  const [name, setName] = useState('')
+  const [room, setRoom] = useState('')
 
-  const [message, setMessage] = useState([])
+  const [message, setMessage] = useState([{}])
   const [messages, setMessages] = useState([])
 
-  const ENDPOINT = 'localhost:5000'
+  const ENDPOINT = 'https://chat-app-fad.herokuapp.com/'
 
   useEffect(() => {
-    const { name, room } = queryString.parse(location.search)
+    const data = queryString.parse(location.search)
 
     socket = io(ENDPOINT)
 
-    setNameSession(name)
-    setRoomSession(room)
+    setName(data.name)
+    setRoom(data.room)
 
-    socket.emit('join', { name, room }, () => {})
+    socket.emit('join', { name: data.name, room: data.room }, () => {})
 
     return () => {
       socket.emit('disconnect')
@@ -39,21 +44,22 @@ const Chat = ({ location }) => {
     e.preventDefault()
 
     if (message) {
-      socket.emit('sendMessage', message, () => setMessage(''))
+      socket.emit('sendMessage', message, () => setMessage({}))
+      setMessage({ text: '' })
     }
   }
-  console.log(messages)
   return (
-    <div>
-      <div>
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => (e.key === 'Enter' ? sendMessage(e) : null)}
-          type='text'
+    <FlexContainer>
+      <Container>
+        <InfoBar room={room} />
+        <Messages messages={messages} name={name} />
+        <Input
+          setMessage={setMessage}
+          sendMessage={sendMessage}
+          message={message}
         />
-      </div>
-    </div>
+      </Container>
+    </FlexContainer>
   )
 }
 

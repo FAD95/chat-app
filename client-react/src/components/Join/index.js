@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Container, JoinForm, FormName } from './styles'
-
+import { JoinForm, FormName, Button, Hr } from './styles'
+import { FlexContainer } from '../../styles/utils'
 const Join = () => {
   const [name, setName] = useState('')
   const [room, setRoom] = useState('')
@@ -17,9 +17,10 @@ const Join = () => {
   }
 
   return (
-    <Container>
+    <FlexContainer>
       <JoinForm>
         <FormName>Join</FormName>
+        <Hr />
         <div className='form-group mt-5'>
           <input
             type='text'
@@ -40,12 +41,12 @@ const Join = () => {
           onClick={(e) => (!name || !room ? handleSubmitError(e) : null)}
           to={`/chat?name=${name}&room=${room}`}
         >
-          <button className='btn btn-primary mt-3' type='submit'>
+          <Button className='btn mt-3' type='submit'>
             Sign In
-          </button>
+          </Button>
         </Link>
       </JoinForm>
-    </Container>
+    </FlexContainer>
   )
 }
 
